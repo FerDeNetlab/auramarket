@@ -98,15 +98,15 @@ INSERT INTO marketplaces (name, slug, status, product_count) VALUES
 INSERT INTO products (provider_id, sku, name, description, brand, category, price, stock) 
 SELECT 
   p.id,
-  'CVA-' || generate_series(1, 10),
-  'Laptop HP ProBook ' || (400 + generate_series) || ' G' || (generate_series % 3 + 8),
+  'CVA-' || s.num,
+  'Laptop HP ProBook ' || (400 + s.num) || ' G' || (s.num % 3 + 8),
   'Laptop empresarial con procesador Intel',
-  CASE (generate_series % 3)
+  CASE (s.num % 3)
     WHEN 0 THEN 'HP'
     WHEN 1 THEN 'Dell'
     ELSE 'Lenovo'
   END,
-  CASE (generate_series % 4)
+  CASE (s.num % 4)
     WHEN 0 THEN 'Laptops'
     WHEN 1 THEN 'Monitores'
     WHEN 2 THEN 'Periféricos'
@@ -115,23 +115,23 @@ SELECT
   (8000 + (random() * 15000))::DECIMAL(10,2),
   (10 + (random() * 200))::INTEGER
 FROM providers p
-WHERE p.slug = 'cva'
-CROSS JOIN generate_series(1, 10);
+CROSS JOIN generate_series(1, 10) AS s(num)
+WHERE p.slug = 'cva';
 
 -- Productos de ejemplo (FulFil)
 INSERT INTO products (provider_id, sku, name, description, brand, category, price, stock)
 SELECT 
   p.id,
-  'FFL-' || generate_series(1, 10),
-  'Producto Electrónico ' || generate_series,
+  'FFL-' || s.num,
+  'Producto Electrónico ' || s.num,
   'Producto desde China',
   'Generic',
   'Electrónicos',
   (500 + (random() * 3000))::DECIMAL(10,2),
   (50 + (random() * 500))::INTEGER
 FROM providers p
-WHERE p.slug = 'fulfil'
-CROSS JOIN generate_series(1, 10);
+CROSS JOIN generate_series(1, 10) AS s(num)
+WHERE p.slug = 'fulfil';
 
 -- Logs de sincronización
 INSERT INTO sync_logs (provider_id, action, status, products_synced, message)
