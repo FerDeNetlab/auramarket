@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -12,6 +13,8 @@ import {
     Cpu,
     Globe,
     HelpCircle,
+    Menu,
+    X,
 } from 'lucide-react';
 
 interface NavItem {
@@ -56,78 +59,53 @@ const navigation: NavItem[] = [
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const isActive = (href: string) => {
         if (href === '/') return pathname === '/';
         return pathname.startsWith(href);
     };
 
-    return (
-        <aside
-            style={{
-                position: 'fixed',
-                left: 0,
-                top: 0,
-                height: '100vh',
-                width: '280px',
-                backgroundColor: '#111118',
-                borderRight: '1px solid #2a2a3a',
-                display: 'flex',
-                flexDirection: 'column',
-                zIndex: 50,
-            }}
-        >
+    const closeMobileMenu = () => setMobileMenuOpen(false);
+
+    const NavContent = () => (
+        <>
             {/* Logo */}
-            <div style={{ padding: '24px', borderBottom: '1px solid #2a2a3a' }}>
-                <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
-                    <div
-                        className="gradient-primary"
-                        style={{
-                            width: '40px',
-                            height: '40px',
-                            borderRadius: '12px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <span style={{ color: 'white', fontWeight: 'bold', fontSize: '18px' }}>A</span>
+            <div className="p-5 border-b border-border">
+                <Link href="/" className="flex items-center gap-3 no-underline" onClick={closeMobileMenu}>
+                    <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
+                        <span className="text-white font-bold text-lg">A</span>
                     </div>
                     <div>
-                        <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: 'white', margin: 0 }}>Sistema Aura</h1>
-                        <p style={{ fontSize: '12px', color: '#71717a', margin: 0 }}>Aura Market Admin</p>
+                        <h1 className="text-lg font-semibold text-white m-0">Sistema Aura</h1>
+                        <p className="text-xs text-muted m-0">Aura Market Admin</p>
                     </div>
                 </Link>
             </div>
 
             {/* Navigation */}
-            <nav style={{ flex: 1, padding: '16px', overflowY: 'auto' }}>
-                <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
+            <nav className="flex-1 p-4 overflow-y-auto">
+                <ul className="space-y-1">
                     {navigation.map((item) => (
-                        <li key={item.href} style={{ marginBottom: '4px' }}>
+                        <li key={item.href}>
                             <Link
                                 href={item.href}
+                                onClick={!item.children ? closeMobileMenu : undefined}
+                                className="flex items-center gap-3 px-4 py-3 rounded-lg no-underline transition-colors"
                                 style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '12px',
-                                    padding: '12px 16px',
-                                    borderRadius: '8px',
-                                    textDecoration: 'none',
-                                    transition: 'all 0.2s',
-                                    backgroundColor: isActive(item.href) ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-                                    color: isActive(item.href) ? '#8b5cf6' : '#a1a1aa',
+                                    backgroundColor: isActive(item.href) ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                                    color: isActive(item.href) ? '#3b82f6' : '#94a3b8',
                                 }}
                             >
-                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '20px', height: '20px' }}>
+                                <span className="flex items-center justify-center w-5 h-5">
                                     {item.icon}
                                 </span>
-                                <span style={{ flex: 1, fontWeight: 500 }}>{item.label}</span>
+                                <span className="flex-1 font-medium">{item.label}</span>
                                 {item.children && (
                                     <ChevronRight
                                         size={16}
+                                        className="transition-transform"
                                         style={{
-                                            transition: 'transform 0.2s',
                                             transform: isActive(item.href) ? 'rotate(90deg)' : 'rotate(0deg)',
                                         }}
                                     />
@@ -136,24 +114,19 @@ export default function Sidebar() {
 
                             {/* Children */}
                             {item.children && isActive(item.href) && (
-                                <ul style={{ listStyle: 'none', paddingLeft: '16px', marginTop: '4px', margin: 0 }}>
+                                <ul className="mt-1 ml-4 space-y-1">
                                     {item.children.map((child) => (
-                                        <li key={child.href} style={{ marginBottom: '4px' }}>
+                                        <li key={child.href}>
                                             <Link
                                                 href={child.href}
+                                                onClick={closeMobileMenu}
+                                                className="flex items-center gap-3 px-4 py-2 rounded-lg no-underline text-sm transition-colors"
                                                 style={{
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '12px',
-                                                    padding: '8px 16px',
-                                                    borderRadius: '8px',
-                                                    textDecoration: 'none',
-                                                    fontSize: '14px',
-                                                    backgroundColor: pathname === child.href ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-                                                    color: pathname === child.href ? '#8b5cf6' : '#71717a',
+                                                    backgroundColor: pathname === child.href ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                                                    color: pathname === child.href ? '#3b82f6' : '#64748b',
                                                 }}
                                             >
-                                                <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '18px', height: '18px' }}>
+                                                <span className="flex items-center justify-center w-4 h-4">
                                                     {child.icon}
                                                 </span>
                                                 <span>{child.label}</span>
@@ -168,40 +141,63 @@ export default function Sidebar() {
             </nav>
 
             {/* Footer */}
-            <div style={{ padding: '16px', borderTop: '1px solid #2a2a3a' }}>
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '12px',
-                        padding: '12px 16px',
-                        borderRadius: '8px',
-                        backgroundColor: '#1a1a24',
-                    }}
-                >
-                    <div
-                        style={{
-                            width: '32px',
-                            height: '32px',
-                            borderRadius: '50%',
-                            background: 'linear-gradient(135deg, #8b5cf6, #06b6d4)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <span style={{ color: 'white', fontSize: '14px', fontWeight: 500 }}>AM</span>
+            <div className="p-4 border-t border-border">
+                <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-3">
+                    <div className="w-8 h-8 rounded-full gradient-primary flex items-center justify-center">
+                        <span className="text-white text-xs font-medium">AM</span>
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '14px', fontWeight: 500, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            Aura Market
-                        </p>
-                        <p style={{ fontSize: '12px', color: '#71717a', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            admin@auramarket.mx
-                        </p>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white m-0 truncate">Aura Market</p>
+                        <p className="text-xs text-muted m-0 truncate">admin@auramarket.mx</p>
                     </div>
                 </div>
             </div>
-        </aside>
+        </>
+    );
+
+    return (
+        <>
+            {/* Mobile Header */}
+            <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-surface-1 border-b border-border">
+                <div className="flex items-center justify-between px-4 py-3">
+                    <Link href="/" className="flex items-center gap-3 no-underline">
+                        <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+                            <span className="text-white font-bold text-sm">A</span>
+                        </div>
+                        <span className="text-white font-semibold">Sistema Aura</span>
+                    </Link>
+                    <button
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="p-2 rounded-lg bg-surface-3 text-subtle hover:text-white transition-colors"
+                        style={{ border: 'none', cursor: 'pointer' }}
+                    >
+                        {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                    </button>
+                </div>
+            </header>
+
+            {/* Mobile Overlay */}
+            {mobileMenuOpen && (
+                <div
+                    className="md:hidden fixed inset-0 bg-black/50 z-40"
+                    onClick={closeMobileMenu}
+                />
+            )}
+
+            {/* Mobile Sidebar */}
+            <aside
+                className="md:hidden fixed top-0 left-0 bottom-0 w-72 bg-surface-1 z-50 flex flex-col transition-transform duration-300"
+                style={{
+                    transform: mobileMenuOpen ? 'translateX(0)' : 'translateX(-100%)',
+                }}
+            >
+                <NavContent />
+            </aside>
+
+            {/* Desktop Sidebar */}
+            <aside className="hidden md:flex fixed top-0 left-0 bottom-0 w-64 lg:w-72 bg-surface-1 border-r border-border flex-col z-40">
+                <NavContent />
+            </aside>
+        </>
     );
 }

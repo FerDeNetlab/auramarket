@@ -27,14 +27,14 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ backgroundColor: '#0a0a0f', color: '#f5f5f7' }}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-surface-1`}
       >
-        <div className="flex min-h-screen">
+        <div className="min-h-screen">
           <Sidebar />
-          <div style={{ flex: 1, marginLeft: '280px' }}>
+          {/* Main content area - responsive margin for sidebar */}
+          <div className="pt-14 md:pt-0 md:ml-64 lg:ml-72 min-h-screen">
             <Header />
-            <main style={{ paddingTop: '64px', minHeight: '100vh' }}>
+            <main className="md:pt-16 p-4 md:p-6 lg:p-8">
               {children}
             </main>
           </div>
@@ -43,4 +43,3 @@ export default function RootLayout({
     </html>
   );
 }
-

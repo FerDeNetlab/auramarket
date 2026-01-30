@@ -13,133 +13,51 @@ export default function Header() {
         .sort((a, b) => (b.lastSync?.getTime() || 0) - (a.lastSync?.getTime() || 0))[0]?.lastSync;
 
     return (
-        <header
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: '280px',
-                right: 0,
-                height: '64px',
-                backgroundColor: 'rgba(17, 17, 24, 0.9)',
-                backdropFilter: 'blur(12px)',
-                borderBottom: '1px solid #2a2a3a',
-                zIndex: 40,
-            }}
-        >
-            <div
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    height: '100%',
-                    padding: '0 24px',
-                }}
-            >
+        <header className="hidden md:block fixed top-0 left-64 lg:left-72 right-0 h-16 bg-surface-1/95 backdrop-blur border-b border-border z-30">
+            <div className="flex items-center justify-between h-full px-6">
                 {/* Search */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1, maxWidth: '576px' }}>
-                    <div style={{ position: 'relative', flex: 1 }}>
+                <div className="flex items-center gap-4 flex-1 max-w-xl">
+                    <div className="relative flex-1">
                         <Search
                             size={18}
-                            style={{
-                                position: 'absolute',
-                                left: '12px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: '#71717a',
-                            }}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
                         />
                         <input
                             type="text"
                             placeholder="Buscar productos, proveedores..."
-                            style={{
-                                width: '100%',
-                                paddingLeft: '40px',
-                                paddingRight: '16px',
-                                paddingTop: '8px',
-                                paddingBottom: '8px',
-                                backgroundColor: '#1a1a24',
-                                border: '1px solid #2a2a3a',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                color: 'white',
-                                outline: 'none',
-                            }}
+                            className="input pl-10"
                         />
                     </div>
                 </div>
 
                 {/* Status & Actions */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <div className="flex items-center gap-3">
                     {/* Sync Status */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '6px 12px',
-                            borderRadius: '8px',
-                            backgroundColor: '#1a1a24',
-                            border: '1px solid #2a2a3a',
-                        }}
-                    >
-                        <RefreshCw size={14} style={{ color: '#71717a' }} />
-                        <span style={{ fontSize: '12px', color: '#a1a1aa' }}>
+                    <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-2 border border-border">
+                        <RefreshCw size={14} className="text-muted" />
+                        <span className="text-xs text-subtle">
                             Última sync: {formatDate(lastSync || null)}
                         </span>
                     </div>
 
                     {/* Connection Status */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '6px 12px',
-                            borderRadius: '8px',
-                            backgroundColor: '#1a1a24',
-                            border: '1px solid #2a2a3a',
-                        }}
-                    >
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-surface-2 border border-border">
                         <div
+                            className="w-2 h-2 rounded-full"
                             style={{
-                                width: '8px',
-                                height: '8px',
-                                borderRadius: '50%',
-                                backgroundColor: autoAzurStatus === 'connected' ? '#10b981' :
+                                backgroundColor: autoAzurStatus === 'connected' ? '#22c55e' :
                                     autoAzurStatus === 'syncing' ? '#f59e0b' : '#ef4444',
                             }}
                         />
-                        <span style={{ fontSize: '12px', color: '#a1a1aa' }}>
+                        <span className="text-xs text-subtle">
                             {connectedProviders}/3 Proveedores
                         </span>
                     </div>
 
                     {/* Notifications */}
-                    <button
-                        style={{
-                            position: 'relative',
-                            padding: '8px',
-                            borderRadius: '8px',
-                            backgroundColor: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }}
-                    >
-                        <Bell size={20} style={{ color: '#a1a1aa' }} />
-                        <span
-                            style={{
-                                position: 'absolute',
-                                top: '4px',
-                                right: '4px',
-                                width: '8px',
-                                height: '8px',
-                                backgroundColor: '#8b5cf6',
-                                borderRadius: '50%',
-                            }}
-                        />
+                    <button className="relative p-2 rounded-lg hover:bg-surface-3 transition-colors btn-ghost">
+                        <Bell size={20} className="text-subtle" />
+                        <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
                     </button>
                 </div>
             </div>
