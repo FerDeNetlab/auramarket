@@ -7,47 +7,52 @@ export interface Provider {
   name: string;
   slug: string;
   description: string;
-  logo?: string;
   status: ConnectionStatus;
-  lastSync: Date | null;
   productCount: number;
-  endpoint?: string;
+  apiUrl?: string;
+  apiKey?: string;
+  lastSync?: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface Product {
   id: string;
+  providerId: string;
   sku: string;
   name: string;
-  description: string;
+  description?: string;
+  brand?: string;
+  category?: string;
   price: number;
-  currency: string;
   stock: number;
-  category: string;
-  brand: string;
-  images: string[];
-  providerId: string;
-  providerSku: string;
-  syncedToAutoAzur: boolean;
-  lastUpdated: Date;
+  images?: string[];
+  metadata?: Record<string, any>;
+  syncedToAutoazur: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface SyncLog {
   id: string;
   providerId: string;
-  type: 'download' | 'upload';
+  action: string;
   status: 'success' | 'error' | 'pending';
-  message: string;
-  productsAffected: number;
-  timestamp: Date;
+  productsSynced: number;
+  message?: string;
+  createdAt: Date;
 }
 
 export interface Marketplace {
   id: string;
   name: string;
   slug: string;
-  logo?: string;
   status: ConnectionStatus;
   productCount: number;
+  apiUrl?: string;
+  apiKey?: string;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface DashboardStats {

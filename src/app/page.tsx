@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import StatsCards from '@/components/dashboard/StatsCards';
 import ActivityLog from '@/components/dashboard/ActivityLog';
@@ -24,7 +25,23 @@ function FlowSkeleton() {
 }
 
 export default function DashboardPage() {
-  const { syncProvider, uploadToAutoAzur, providers, autoAzurStatus } = useAuraStore();
+  const {
+    syncProvider,
+    uploadToAutoAzur,
+    providers,
+    autoAzurStatus,
+    loadProviders,
+    loadMarketplaces,
+    loadSyncLogs,
+    isLoading,
+  } = useAuraStore();
+
+  // Load data from Supabase on mount
+  useEffect(() => {
+    loadProviders();
+    loadMarketplaces();
+    loadSyncLogs();
+  }, []);
 
   const isSyncing = providers.some(p => p.status === 'syncing') || autoAzurStatus === 'syncing';
 
@@ -135,8 +152,8 @@ export default function DashboardPage() {
               >
                 <div className="flex items-center gap-3">
                   <div className={`w-2 h-2 rounded-full ${provider.status === 'connected' ? 'bg-success' :
-                      provider.status === 'syncing' ? 'bg-warning animate-pulse' :
-                        'bg-text-muted'
+                    provider.status === 'syncing' ? 'bg-warning animate-pulse' :
+                      'bg-text-muted'
                     }`} />
                   <span className="text-sm text-white">{provider.name}</span>
                 </div>
