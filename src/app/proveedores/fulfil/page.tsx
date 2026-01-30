@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuraStore } from '@/lib/store';
 import { formatDate, formatNumber, formatCurrency } from '@/lib/utils';
 import {
@@ -31,8 +31,12 @@ const mockProducts = [
 ];
 
 export default function FulFilPage() {
-    const { providers, syncProvider, uploadToAutoAzur } = useAuraStore();
-    const provider = providers.find(p => p.id === 'fulfil');
+    const { providers, syncProvider, uploadToAutoAzur, loadProviders } = useAuraStore();
+    const provider = providers.find(p => p.slug === 'fulfil');
+
+    useEffect(() => {
+        loadProviders();
+    }, []);
 
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('all');
@@ -73,16 +77,16 @@ export default function FulFilPage() {
                         <p className="text-subtle">{provider.description}</p>
                         <div className="flex items-center gap-3 mt-2">
                             <span className={`status-badge ${provider.status === 'connected' ? 'status-connected' :
-                                    provider.status === 'syncing' ? 'status-syncing' : 'status-disconnected'
+                                provider.status === 'syncing' ? 'status-syncing' : 'status-disconnected'
                                 }`}>
                                 <div className={`w-2 h-2 rounded-full ${provider.status === 'connected' ? 'bg-success' :
-                                        provider.status === 'syncing' ? 'bg-warning animate-pulse' : 'bg-text-muted'
+                                    provider.status === 'syncing' ? 'bg-warning animate-pulse' : 'bg-text-muted'
                                     }`} />
                                 {provider.status === 'connected' ? 'Conectado' :
                                     provider.status === 'syncing' ? 'Sincronizando' : 'Desconectado'}
                             </span>
                             <span className="text-xs text-muted">
-                                Última sync: {formatDate(provider.lastSync)}
+                                Última sync: {formatDate(provider.lastSync || null)}
                             </span>
                         </div>
                     </div>
@@ -90,7 +94,7 @@ export default function FulFilPage() {
 
                 <div className="flex gap-3">
                     <button
-                        onClick={() => syncProvider('fulfil')}
+                        onClick={() => syncProvider(provider.id)}
                         disabled={provider.status === 'syncing'}
                         className="btn btn-secondary"
                     >
@@ -98,7 +102,7 @@ export default function FulFilPage() {
                         Sincronizar
                     </button>
                     <button
-                        onClick={() => uploadToAutoAzur('fulfil')}
+                        onClick={() => uploadToAutoAzur(provider.id)}
                         disabled={provider.status === 'syncing'}
                         className="btn btn-primary"
                     >

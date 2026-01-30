@@ -33,29 +33,29 @@ export default function ActivityLog() {
         {
             id: '1',
             providerId: 'cva',
-            type: 'download' as const,
+            action: 'download',
             status: 'success' as const,
             message: 'Sincronización automática completada',
-            productsAffected: 324,
-            timestamp: new Date(Date.now() - 3600000),
+            productsSynced: 324,
+            createdAt: new Date(Date.now() - 3600000),
         },
         {
             id: '2',
             providerId: 'fulfil',
-            type: 'upload' as const,
+            action: 'upload',
             status: 'success' as const,
             message: 'Productos subidos a AutoAzur',
-            productsAffected: 156,
-            timestamp: new Date(Date.now() - 7200000),
+            productsSynced: 156,
+            createdAt: new Date(Date.now() - 7200000),
         },
         {
             id: '3',
             providerId: 'cva',
-            type: 'download' as const,
+            action: 'download',
             status: 'success' as const,
             message: 'Actualización de precios completada',
-            productsAffected: 892,
-            timestamp: new Date(Date.now() - 10800000),
+            productsSynced: 892,
+            createdAt: new Date(Date.now() - 10800000),
         },
     ];
 
@@ -73,7 +73,7 @@ export default function ActivityLog() {
                         className="flex items-center gap-3 p-3 rounded-lg bg-surface-1 hover:bg-surface-3 transition-colors"
                     >
                         <div className="flex items-center gap-2">
-                            {getTypeIcon(log.type)}
+                            {getTypeIcon(log.action)}
                             {getStatusIcon(log.status)}
                         </div>
 
@@ -82,12 +82,12 @@ export default function ActivityLog() {
                             <div className="flex items-center gap-2 mt-0.5">
                                 <span className="text-xs text-muted">{getProviderName(log.providerId)}</span>
                                 <span className="text-xs text-muted">•</span>
-                                <span className="text-xs text-muted">{log.productsAffected} productos</span>
+                                <span className="text-xs text-muted">{log.productsSynced} productos</span>
                             </div>
                         </div>
 
                         <span className="text-xs text-muted whitespace-nowrap">
-                            {formatDate(log.timestamp)}
+                            {formatDate(log.createdAt)}
                         </span>
                     </div>
                 ))}
