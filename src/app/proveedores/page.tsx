@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useAuraStore } from '@/lib/store';
 import { formatDate, formatNumber } from '@/lib/utils';
@@ -18,7 +19,11 @@ const providerColors = {
 };
 
 export default function ProveedoresPage() {
-    const { providers, syncProvider } = useAuraStore();
+    const { providers, syncProvider, loadProviders } = useAuraStore();
+
+    useEffect(() => {
+        loadProviders();
+    }, []);
 
     return (
         <div className="p-6 space-y-6">
@@ -33,8 +38,8 @@ export default function ProveedoresPage() {
             {/* Provider Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {providers.map((provider) => {
-                    const Icon = providerIcons[provider.id as keyof typeof providerIcons] || HelpCircle;
-                    const colorClass = providerColors[provider.id as keyof typeof providerColors] || providerColors.tbd;
+                    const Icon = providerIcons[provider.slug as keyof typeof providerIcons] || HelpCircle;
+                    const colorClass = providerColors[provider.slug as keyof typeof providerColors] || providerColors.tbd;
 
                     return (
                         <div
@@ -43,14 +48,14 @@ export default function ProveedoresPage() {
                         >
                             {/* Status Badge */}
                             <div className={`absolute top-4 right-4 status-badge ${provider.status === 'connected' ? 'status-connected' :
-                                    provider.status === 'syncing' ? 'status-syncing' :
-                                        provider.status === 'error' ? 'status-error' :
-                                            'status-disconnected'
+                                provider.status === 'syncing' ? 'status-syncing' :
+                                    provider.status === 'error' ? 'status-error' :
+                                        'status-disconnected'
                                 }`}>
                                 <div className={`w-2 h-2 rounded-full ${provider.status === 'connected' ? 'bg-success' :
-                                        provider.status === 'syncing' ? 'bg-warning animate-pulse' :
-                                            provider.status === 'error' ? 'bg-error' :
-                                                'bg-text-muted'
+                                    provider.status === 'syncing' ? 'bg-warning animate-pulse' :
+                                        provider.status === 'error' ? 'bg-error' :
+                                            'bg-text-muted'
                                     }`} />
                                 {provider.status === 'connected' ? 'Conectado' :
                                     provider.status === 'syncing' ? 'Sincronizando' :
@@ -76,7 +81,7 @@ export default function ProveedoresPage() {
                                 </div>
                                 <div className="p-3 rounded-lg bg-surface-1/30">
                                     <p className="text-xs text-muted">Última Sync</p>
-                                    <p className="text-sm font-medium text-white">{formatDate(provider.lastSync)}</p>
+                                    <p className="text-sm font-medium text-white">{formatDate(provider.lastSync || null)}</p>
                                 </div>
                             </div>
 
