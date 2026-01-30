@@ -1,140 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import {
-    ReactFlow,
-    Background,
-    Controls,
-    Node,
-    Edge,
-    Position,
-    Handle,
-} from '@xyflow/react';
-import '@xyflow/react/dist/style.css';
 import { useAuraStore } from '@/lib/store';
-import { ConnectionStatus } from '@/types';
-import { Cpu, Globe, HelpCircle, Zap, ShoppingCart, Store, Package, LucideIcon } from 'lucide-react';
-
-interface NodeData {
-    label: string;
-    status: ConnectionStatus;
-    productCount?: number;
-    icon?: LucideIcon;
-}
-
-interface CustomNodeProps {
-    data: NodeData;
-}
-
-// Custom node component for providers
-function ProviderNode({ data }: CustomNodeProps) {
-    const status = data.status;
-    const Icon = data.icon;
-
-    return (
-        <div className={`relative px-6 py-4 rounded-xl border-2 transition-all duration-300 ${status === 'connected' ? 'bg-surface-2 border-success/50 shadow-[0_0_20px_rgba(16,185,129,0.2)]' :
-            status === 'syncing' ? 'bg-surface-2 border-warning/50 shadow-[0_0_20px_rgba(245,158,11,0.2)] animate-pulse' :
-                status === 'error' ? 'bg-surface-2 border-error/50 shadow-[0_0_20px_rgba(239,68,68,0.2)]' :
-                    'bg-surface-2 border-border'
-            }`}>
-            <Handle type="source" position={Position.Right} className="!bg-primary !w-3 !h-3" />
-
-            <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${status === 'connected' ? 'bg-success/20 text-success' :
-                    status === 'syncing' ? 'bg-warning/20 text-warning' :
-                        status === 'error' ? 'bg-error/20 text-error' :
-                            'bg-surface-3 text-muted'
-                    }`}>
-                    {Icon && <Icon size={20} />}
-                </div>
-                <div>
-                    <p className="font-semibold text-white text-sm">{data.label}</p>
-                    <p className="text-xs text-muted">{data.productCount?.toLocaleString() || 0} productos</p>
-                </div>
-            </div>
-
-            {/* Status indicator */}
-            <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ring-2 ring-surface-2 ${status === 'connected' ? 'bg-success' :
-                status === 'syncing' ? 'bg-warning animate-ping' :
-                    status === 'error' ? 'bg-error' :
-                        'bg-text-muted'
-                }`} />
-        </div>
-    );
-}
-
-// Custom node for AutoAzur (center hub)
-function HubNode({ data }: CustomNodeProps) {
-    const status = data.status;
-
-    return (
-        <div className={`relative px-8 py-6 rounded-2xl border-2 transition-all duration-300 ${status === 'connected' ? 'gradient-primary border-transparent shadow-[0_0_40px_rgba(139,92,246,0.3)]' :
-            status === 'syncing' ? 'bg-warning/20 border-warning shadow-[0_0_40px_rgba(245,158,11,0.3)] animate-pulse' :
-                'bg-surface-2 border-border'
-            }`}>
-            <Handle type="target" position={Position.Left} className="!bg-secondary !w-3 !h-3" />
-            <Handle type="source" position={Position.Right} className="!bg-secondary !w-3 !h-3" />
-
-            <div className="flex flex-col items-center gap-2">
-                <div className="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center">
-                    <Zap size={28} className="text-white" />
-                </div>
-                <div className="text-center">
-                    <p className="font-bold text-white text-lg">{data.label}</p>
-                    <p className="text-xs text-white/70">Integrador Central</p>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// Custom node for marketplaces
-function MarketplaceNode({ data }: CustomNodeProps) {
-    const status = data.status;
-    const Icon = data.icon;
-
-    return (
-        <div className={`relative px-6 py-4 rounded-xl border-2 transition-all duration-300 ${status === 'connected' ? 'bg-surface-2 border-secondary/50 shadow-[0_0_20px_rgba(6,182,212,0.2)]' :
-            status === 'syncing' ? 'bg-surface-2 border-warning/50 shadow-[0_0_20px_rgba(245,158,11,0.2)] animate-pulse' :
-                'bg-surface-2 border-border'
-            }`}>
-            <Handle type="target" position={Position.Left} className="!bg-secondary !w-3 !h-3" />
-
-            <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${status === 'connected' ? 'bg-secondary/20 text-secondary' :
-                    status === 'syncing' ? 'bg-warning/20 text-warning' :
-                        'bg-surface-3 text-muted'
-                    }`}>
-                    {Icon && <Icon size={20} />}
-                </div>
-                <div>
-                    <p className="font-semibold text-white text-sm">{data.label}</p>
-                    <p className="text-xs text-muted">{data.productCount?.toLocaleString() || 0} publicados</p>
-                </div>
-            </div>
-
-            {/* Status indicator */}
-            <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ring-2 ring-surface-2 ${status === 'connected' ? 'bg-secondary' :
-                status === 'syncing' ? 'bg-warning animate-ping' :
-                    'bg-text-muted'
-                }`} />
-        </div>
-    );
-}
-
-const nodeTypes = {
-    provider: ProviderNode,
-    hub: HubNode,
-    marketplace: MarketplaceNode,
-};
+import { Cpu, Globe, HelpCircle, Zap, ShoppingCart, Store, Package, ArrowRight } from 'lucide-react';
 
 export default function ConnectionFlow() {
     const { providers, marketplaces, autoAzurStatus } = useAuraStore();
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
 
     const providerIcons = {
         cva: Cpu,
@@ -148,91 +18,175 @@ export default function ConnectionFlow() {
         walmart: Store,
     };
 
-    const nodes: Node[] = [
-        // Providers (left side)
-        ...providers.map((provider, index) => ({
-            id: provider.id,
-            type: 'provider',
-            position: { x: 50, y: 80 + index * 120 },
-            data: {
-                label: provider.name,
-                status: provider.status,
-                productCount: provider.productCount,
-                icon: providerIcons[provider.id as keyof typeof providerIcons],
-            },
-        })),
-        // AutoAzur (center)
-        {
-            id: 'autoazur',
-            type: 'hub',
-            position: { x: 350, y: 140 },
-            data: {
-                label: 'AutoAzur',
-                status: autoAzurStatus,
-            },
-        },
-        // Marketplaces (right side)
-        ...marketplaces.map((marketplace, index) => ({
-            id: marketplace.id,
-            type: 'marketplace',
-            position: { x: 650, y: 80 + index * 120 },
-            data: {
-                label: marketplace.name,
-                status: marketplace.status,
-                productCount: marketplace.productCount,
-                icon: marketplaceIcons[marketplace.id as keyof typeof marketplaceIcons],
-            },
-        })),
-    ];
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'connected':
+                return 'border-emerald-500/30 bg-emerald-500/5';
+            case 'syncing':
+                return 'border-amber-500/30 bg-amber-500/5 animate-pulse';
+            case 'error':
+                return 'border-red-500/30 bg-red-500/5';
+            default:
+                return 'border-gray-700 bg-gray-800/30';
+        }
+    };
 
-    const edges: Edge[] = [
-        // Provider -> AutoAzur edges
-        ...providers.map((provider) => ({
-            id: `${provider.id}-autoazur`,
-            source: provider.id,
-            target: 'autoazur',
-            animated: provider.status === 'syncing',
-            style: {
-                stroke: provider.status === 'connected' ? '#10b981' :
-                    provider.status === 'syncing' ? '#f59e0b' : '#3a3a4a',
-                strokeWidth: 2,
-            },
-        })),
-        // AutoAzur -> Marketplace edges
-        ...marketplaces.map((marketplace) => ({
-            id: `autoazur-${marketplace.id}`,
-            source: 'autoazur',
-            target: marketplace.id,
-            animated: marketplace.status === 'syncing',
-            style: {
-                stroke: marketplace.status === 'connected' ? '#06b6d4' :
-                    marketplace.status === 'syncing' ? '#f59e0b' : '#3a3a4a',
-                strokeWidth: 2,
-            },
-        })),
-    ];
-
-    if (!mounted) {
-        return (
-            <div className="w-full h-[450px] bg-surface-2 rounded-2xl border border-border flex items-center justify-center">
-                <div className="animate-pulse text-muted">Cargando diagrama...</div>
-            </div>
-        );
-    }
+    const getStatusDot = (status: string) => {
+        switch (status) {
+            case 'connected':
+                return 'bg-emerald-500';
+            case 'syncing':
+                return 'bg-amber-500 animate-pulse';
+            case 'error':
+                return 'bg-red-500';
+            default:
+                return 'bg-gray-500';
+        }
+    };
 
     return (
-        <div className="w-full h-[450px] bg-surface-2 rounded-2xl border border-border overflow-hidden">
-            <ReactFlow
-                nodes={nodes}
-                edges={edges}
-                nodeTypes={nodeTypes}
-                fitView
-                proOptions={{ hideAttribution: true }}
-                className="bg-surface-1"
-            >
-                <Background color="#2a2a3a" gap={20} size={1} />
-                <Controls className="!bg-surface-2 !border-border !rounded-lg [&>button]:!bg-surface-3 [&>button]:!border-border [&>button]:!text-subtle [&>button:hover]:!bg-primary" />
-            </ReactFlow>
+        <div className="w-full bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 p-6 md:p-8">
+            {/* Mobile: Vertical Flow */}
+            <div className="block md:hidden space-y-6">
+                {/* Providers Section */}
+                <div className="space-y-3">
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Proveedores</h3>
+                    {providers.map((provider) => {
+                        const Icon = providerIcons[provider.slug as keyof typeof providerIcons] || HelpCircle;
+                        return (
+                            <div key={provider.id} className={`p-4 rounded-xl border transition-all ${getStatusColor(provider.status)}`}>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center border border-gray-700">
+                                        <Icon size={20} className="text-gray-300" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            <p className="font-medium text-white text-sm truncate">{provider.name}</p>
+                                            <div className={`w-2 h-2 rounded-full ${getStatusDot(provider.status)}`} />
+                                        </div>
+                                        <p className="text-xs text-gray-400">{provider.productCount.toLocaleString()} productos</p>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* AutoAzur Hub */}
+                <div className="flex justify-center py-2">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-600 to-violet-700 flex items-center justify-center shadow-lg shadow-violet-500/20">
+                        <Zap size={24} className="text-white" />
+                    </div>
+                </div>
+
+                {/* Marketplaces Section */}
+                <div className="space-y-3">
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Marketplaces</h3>
+                    {marketplaces.map((marketplace) => {
+                        const Icon = marketplaceIcons[marketplace.slug as keyof typeof marketplaceIcons] || ShoppingCart;
+                        return (
+                            <div key={marketplace.id} className={`p-4 rounded-xl border transition-all ${getStatusColor(marketplace.status)}`}>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center border border-gray-700">
+                                        <Icon size={20} className="text-gray-300" />
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center gap-2">
+                                            <p className="font-medium text-white text-sm truncate">{marketplace.name}</p>
+                                            <div className={`w-2 h-2 rounded-full ${getStatusDot(marketplace.status)}`} />
+                                        </div>
+                                        <p className="text-xs text-gray-400">{marketplace.productCount.toLocaleString()} publicados</p>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Desktop: Horizontal Flow */}
+            <div className="hidden md:grid grid-cols-[1fr_auto_1fr] gap-8 items-center">
+                {/* Providers Column */}
+                <div className="space-y-4">
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Proveedores</h3>
+                    {providers.map((provider) => {
+                        const Icon = providerIcons[provider.slug as keyof typeof providerIcons] || HelpCircle;
+                        return (
+                            <div key={provider.id} className={`group p-4 rounded-xl border transition-all hover:scale-105 ${getStatusColor(provider.status)}`}>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center border border-gray-700 group-hover:border-gray-600 transition-colors">
+                                        <Icon size={22} className="text-gray-300" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <p className="font-medium text-white text-sm">{provider.name}</p>
+                                            <div className={`w-2 h-2 rounded-full ${getStatusDot(provider.status)}`} />
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-0.5">{provider.productCount.toLocaleString()} productos</p>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
+                {/* Center Hub */}
+                <div className="flex flex-col items-center gap-4 px-4">
+                    <ArrowRight size={24} className="text-gray-600" />
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-violet-600/20 blur-2xl rounded-full"></div>
+                        <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-violet-600 to-violet-700 flex items-center justify-center shadow-2xl shadow-violet-500/30 border border-violet-500/20">
+                            <Zap size={32} className="text-white" />
+                        </div>
+                        <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full ${getStatusDot(autoAzurStatus)}`} />
+                    </div>
+                    <div className="text-center">
+                        <p className="text-sm font-semibold text-white">AutoAzur</p>
+                        <p className="text-xs text-gray-400">Hub Central</p>
+                    </div>
+                    <ArrowRight size={24} className="text-gray-600" />
+                </div>
+
+                {/* Marketplaces Column */}
+                <div className="space-y-4">
+                    <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Marketplaces</h3>
+                    {marketplaces.map((marketplace) => {
+                        const Icon = marketplaceIcons[marketplace.slug as keyof typeof marketplaceIcons] || ShoppingCart;
+                        return (
+                            <div key={marketplace.id} className={`group p-4 rounded-xl border transition-all hover:scale-105 ${getStatusColor(marketplace.status)}`}>
+                                <div className="flex items-center gap-3">
+                                    <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center border border-gray-700 group-hover:border-gray-600 transition-colors">
+                                        <Icon size={22} className="text-gray-300" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <p className="font-medium text-white text-sm">{marketplace.name}</p>
+                                            <div className={`w-2 h-2 rounded-full ${getStatusDot(marketplace.status)}`} />
+                                        </div>
+                                        <p className="text-xs text-gray-400 mt-0.5">{marketplace.productCount.toLocaleString()} publicados</p>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Legend */}
+            <div className="mt-6 pt-6 border-t border-gray-700/50 flex flex-wrap items-center gap-4 justify-center text-xs">
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                    <span className="text-gray-400">Conectado</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span className="text-gray-400">Sincronizando</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-gray-500" />
+                    <span className="text-gray-400">Desconectado</span>
+                </div>
+            </div>
         </div>
     );
 }
